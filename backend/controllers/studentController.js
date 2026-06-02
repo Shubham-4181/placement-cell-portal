@@ -30,6 +30,8 @@ const getStudents = async (req, res) => {
   }
 };
 
+
+
 const getStudentById = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
@@ -78,6 +80,7 @@ const deleteStudent = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   createStudent,
