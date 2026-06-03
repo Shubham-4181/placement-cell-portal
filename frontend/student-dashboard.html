@@ -35,16 +35,16 @@
   <div class="card">
     <div class="card-body">
 
-      <h3>Welcome Student</h3>
+      <h3>Welcome</h3>
 
-      <a
+      <p id="tokenStatus"></p>
+
+       <a
   href="jobs.html"
   class="btn btn-primary"
 >
   View Jobs
 </a>
-
-      <p id="tokenStatus"></p>
 
     </div>
   </div>
@@ -54,16 +54,54 @@
 <script>
 
 const token = localStorage.getItem("token");
+const userId = localStorage.getItem("userId");
 
-if(token){
-  document.getElementById("tokenStatus").innerText =
-  "Login Successful";
-}else{
+if (!token) {
   window.location.href = "login.html";
 }
 
-function logout(){
+async function loadStudentProfile() {
+
+  try {
+
+    const response = await fetch(
+      `http://localhost:8080/api/students/user/${userId}`
+    );
+
+    const data = await response.json();
+
+    if (data.success && data.student) {
+
+  localStorage.setItem(
+    "studentId",
+    data.student._id
+  );
+
+  document.getElementById("tokenStatus").innerHTML = `
+    <h4>${data.student.fullName}</h4>
+
+  `;
+
+} else {
+
+  document.getElementById("tokenStatus").innerHTML =
+    "<p class='text-danger'>Student Profile Not Found</p>";
+
+}
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+loadStudentProfile();
+
+function logout() {
+
   localStorage.removeItem("token");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("studentId");
+
   window.location.href = "login.html";
 }
 

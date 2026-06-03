@@ -1,4 +1,5 @@
 const Application = require("../models/Application");
+const Student = require("../models/Student");
 
 const createApplication = async (req, res) => {
   try {
@@ -49,8 +50,34 @@ const updateApplicationStatus = async (req, res) => {
   }
 };
 
+const getApplicationsByUser = async (req, res) => {
+  try {
+
+    const student =
+      await Student.findOne({
+        userId: req.params.userId
+      });
+
+    const applications =
+      await Application.find({
+        studentId: student._id
+      });
+
+    res.status(200).json({
+      success: true,
+      applications
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createApplication,
   getApplications,
   updateApplicationStatus,
+  getApplicationsByUser,
 };

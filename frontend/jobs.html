@@ -75,11 +75,11 @@ async function applyJob(jobId) {
         },
 
         body: JSON.stringify({
-          studentId:
-          "6a1d791c53d7b0e29f1aa7ec",
+  studentId:
+    localStorage.getItem("studentId"),
 
-          jobId: jobId
-        })
+  jobId: jobId
+})
       }
     );
 

@@ -81,11 +81,30 @@ const deleteStudent = async (req, res) => {
   }
 };
 
+const getStudentByUserId = async (req, res) => {
+  try {
+
+    const student = await Student.findOne({
+      userId: req.params.userId
+    });
+
+    res.status(200).json({
+      success: true,
+      student
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
 
 module.exports = {
   createStudent,
   getStudents,
   getStudentById,
+  getStudentByUserId,
   updateStudent,
   deleteStudent,
 };

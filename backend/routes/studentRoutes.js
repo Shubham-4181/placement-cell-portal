@@ -9,6 +9,7 @@ const {
   createStudent,
   getStudents,
   getStudentById,
+  getStudentByUserId,
   updateStudent,
   deleteStudent,
 } = require("../controllers/studentController");
@@ -16,6 +17,8 @@ const {
 router.post("/", createStudent);
 
 router.get("/", protect, getStudents);
+
+router.get("/user/:userId", getStudentByUserId);
 
 router.get("/:id", getStudentById);
 

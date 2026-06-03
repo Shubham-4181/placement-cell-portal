@@ -23,6 +23,16 @@ const register = async (req, res) => {
       role,
     });
 
+    const Student = require("../models/Student");
+
+if (role === "student") {
+  await Student.create({
+    userId: user._id,
+    fullName: name,
+    email: email,
+  });
+}
+
     res.status(201).json({
       success: true,
       user,
@@ -66,10 +76,11 @@ const login = async (req, res) => {
     );
 
     res.status(200).json({
-      success: true,
-      token,
-      role: user.role,
-    });
+  success: true,
+  token,
+  role: user.role,
+  userId: user._id,
+});
   } catch (error) {
     res.status(500).json({
       message: error.message,

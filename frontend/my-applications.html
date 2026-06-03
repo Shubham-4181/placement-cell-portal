@@ -25,8 +25,11 @@ rel="stylesheet"
 
 async function loadApplications() {
 
+    const userId =
+      localStorage.getItem("userId");
+
     const response = await fetch(
-      "http://localhost:8080/api/applications"
+      `http://localhost:8080/api/applications/user/${userId}`
     );
 
     const data = await response.json();
@@ -36,27 +39,43 @@ async function loadApplications() {
         "applicationsContainer"
       );
 
+    container.innerHTML = "";
+
+    if (
+      !data.applications ||
+      data.applications.length === 0
+    ) {
+
+      container.innerHTML = `
+        <div class="alert alert-info">
+          No Applications Found
+        </div>
+      `;
+
+      return;
+    }
+
     data.applications.forEach(app => {
 
-        container.innerHTML += `
+      container.innerHTML += `
         <div class="card mb-3">
 
-            <div class="card-body">
+          <div class="card-body">
 
-                <h5>
-                  Application ID:
-                  ${app._id}
-                </h5>
+            <h5>
+              Application ID:
+              ${app._id}
+            </h5>
 
-                <p>
-                  Status:
-                  ${app.status}
-                </p>
+            <p>
+              Status:
+              ${app.status}
+            </p>
 
-            </div>
+          </div>
 
         </div>
-        `;
+      `;
     });
 }
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -20,6 +21,21 @@ app.use("/api/companies", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 
+app.use(
+  express.static(
+    path.join(__dirname, "../frontend")
+  )
+);
+
+app.get("/", (req, res) => {
+  res.sendFile(
+    path.join(
+      __dirname,
+      "../frontend/login.html"
+    )
+  );
+});
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -32,6 +48,8 @@ mongoose
 app.get("/", (req, res) => {
   res.send("Placement Cell Portal API Running");
 });
+
+
 
 app.listen(process.env.PORT, () => {
   console.log(`Server Running On Port ${process.env.PORT}`);
