@@ -17,6 +17,13 @@ rel="stylesheet"
 
 <h2>My Applications</h2>
 
+<a
+  href="student-dashboard.html"
+  class="btn btn-secondary mb-3"
+>
+  ← Back to Dashboard
+</a>
+
 <div id="applicationsContainer"></div>
 
 </div>
@@ -57,26 +64,74 @@ async function loadApplications() {
 
     data.applications.forEach(app => {
 
-      container.innerHTML += `
-        <div class="card mb-3">
+let badge = "";
 
-          <div class="card-body">
+if(app.status === "Applied"){
 
-            <h5>
-              Application ID:
-              ${app._id}
-            </h5>
+  badge =
+  `<span class="badge bg-secondary">
+    Applied
+  </span>`;
 
-            <p>
-              Status:
-              ${app.status}
-            </p>
+}
+else if(app.status === "Shortlisted"){
 
-          </div>
+  badge =
+  `<span class="badge bg-warning">
+    Shortlisted
+  </span>`;
 
-        </div>
-      `;
-    });
+}
+else if(app.status === "Rejected"){
+
+  badge =
+  `<span class="badge bg-danger">
+    Rejected
+  </span>`;
+
+}
+else if(app.status === "Selected"){
+
+  badge =
+  `<span class="badge bg-success">
+    Selected
+  </span>`;
+
+}
+
+container.innerHTML += `
+
+<div class="card mb-3">
+
+  <div class="card-body">
+
+    <h5>
+      ${app.jobId?.title || "N/A"}
+    </h5>
+
+    <p>
+
+      <strong>Company:</strong>
+
+      ${app.jobId?.companyId?.name || "N/A"}
+
+    </p>
+
+    <p>
+
+      <strong>Status:</strong>
+
+      ${badge}
+
+    </p>
+
+  </div>
+
+</div>
+
+`;
+
+});
 }
 
 loadApplications();

@@ -75,11 +75,12 @@ const login = async (req, res) => {
       }
     );
 
-    res.status(200).json({
+   res.status(200).json({
   success: true,
   token,
   role: user.role,
   userId: user._id,
+  name: user.name
 });
   } catch (error) {
     res.status(500).json({
@@ -88,4 +89,28 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const getCompanies = async (req, res) => {
+  try {
+
+    const companies =
+      await User.find({
+        role: "company"
+      }).select(
+        "name email"
+      );
+
+    res.status(200).json({
+      success: true,
+      companies
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+};
+
+module.exports = { register, login, getCompanies};

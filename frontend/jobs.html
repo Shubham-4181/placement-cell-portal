@@ -12,83 +12,142 @@
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">Available Jobs</h2>
+  <a
+    href="student-dashboard.html"
+    class="btn btn-secondary mb-3"
+  >
+    ← Back to Dashboard
+  </a>
 
-    <div id="jobsContainer"></div>
+  <h2 class="mb-4">Available Jobs</h2>
+
+  <div id="jobsContainer"></div>
 
 </div>
 
 <script>
 
-const token = localStorage.getItem("token");
-
 async function loadJobs() {
 
-    const response = await fetch(
-        "http://localhost:8080/api/jobs"
-    );
+  const response = await fetch(
+    "http://localhost:8080/api/jobs"
+  );
 
-    const data = await response.json();
+  const data = await response.json();
 
-    const jobsContainer =
-      document.getElementById("jobsContainer");
+  const jobsContainer =
+    document.getElementById("jobsContainer");
 
-    data.jobs.forEach(job => {
+  jobsContainer.innerHTML = "";
 
-        jobsContainer.innerHTML += `
-            <div class="card mb-3">
-                <div class="card-body">
+  data.jobs.forEach(job => {
 
-                    <h4>${job.title}</h4>
+    jobsContainer.innerHTML += `
+      <div class="card mb-3">
+        <div class="card-body">
 
-                    <p>${job.description}</p>
+          <p>
+            <strong>Company:</strong>
+            ${job.companyId?.name || "N/A"}
+          </p>
 
-                    <p>
-                      Package:
-                      ₹${job.package}
-                    </p>
+          <h4>${job.title}</h4>
 
-                    <button
-  class="btn btn-success"
-  onclick="applyJob('${job._id}')"
->
-  Apply
-</button>
+          <p>
+            ${job.description}
+          </p>
 
-                </div>
-            </div>
-        `;
-    });
+          <p>
+            <strong>Package:</strong>
+            ₹${job.package || 0}
+          </p>
+
+          <button
+            class="btn btn-success"
+            onclick="applyJob('${job._id}')"
+          >
+            Apply
+          </button>
+
+        </div>
+      </div>
+    `;
+
+  });
+
 }
-
-loadJobs();
 
 async function applyJob(jobId) {
 
-    const response = await fetch(
+  const userId =
+    localStorage.getItem("userId");
+
+  const studentResponse =
+    await fetch(
+      `http://localhost:8080/api/students/user/${userId}`
+    );
+
+  const studentData =
+    await studentResponse.json();
+
+  if (
+    !studentData.student ||
+    !studentData.student.resumeUrl
+  ) {
+
+    alert(
+      "Please upload your resume before applying."
+    );
+
+    window.location.href =
+      "student-dashboard.html";
+
+    return;
+
+  }
+
+  const response =
+    await fetch(
       "http://localhost:8080/api/applications",
       {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+          "application/json"
         },
 
         body: JSON.stringify({
-  studentId:
-    localStorage.getItem("studentId"),
+          studentId:
+          localStorage.getItem(
+            "studentId"
+          ),
 
-  jobId: jobId
-})
+          jobId
+        })
       }
     );
 
-    const data = await response.json();
+  const data =
+    await response.json();
 
-    console.log(data);
+  if (data.success) {
 
-    alert("Application Submitted");
+    alert(
+      "Application Submitted"
+    );
+
+  } else {
+
+    alert(
+      data.message
+    );
+
+  }
+
 }
+
+loadJobs();
 
 </script>
 

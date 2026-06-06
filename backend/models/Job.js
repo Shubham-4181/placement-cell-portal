@@ -26,9 +26,9 @@ const jobSchema = new mongoose.Schema(
     },
 
     companyId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
-    },
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User"
+},
   },
   {
     timestamps: true,

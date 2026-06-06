@@ -46,10 +46,31 @@
   View Jobs
 </a>
 
+<hr>
+
+<h4>
+Upload Resume
+</h4>
+
+<input
+type="file"
+id="resumeFile"
+class="form-control"
+/>
+
+<button
+class="btn btn-primary mt-2"
+onclick="uploadResume()"
+>
+Upload Resume
+</button>
+
     </div>
   </div>
 
 </div>
+
+
 
 <script>
 
@@ -103,6 +124,48 @@ function logout() {
   localStorage.removeItem("studentId");
 
   window.location.href = "login.html";
+}
+
+async function uploadResume() {
+
+  const file =
+    document.getElementById(
+      "resumeFile"
+    ).files[0];
+
+  if (!file) {
+    alert("Please select a resume");
+    return;
+  }
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "resume",
+    file
+  );
+
+  const response =
+    await fetch(
+      "http://localhost:8080/api/students/upload-resume",
+      {
+        method: "POST",
+
+        headers: {
+          Authorization:
+          `Bearer ${localStorage.getItem("token")}`
+        },
+
+        body: formData
+      }
+    );
+
+  const data =
+    await response.json();
+
+  alert(data.message);
+
 }
 
 </script>

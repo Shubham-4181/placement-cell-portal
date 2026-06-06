@@ -2,10 +2,16 @@ const express = require("express");
 const router = express.Router();
 
 const {
+  protect,
+  authorize
+} = require("../middleware/authMiddleware");
+
+const {
   createApplication,
   getApplications,
   getApplicationsByUser,
   updateApplicationStatus,
+  getCompanyApplicants
 } = require(
   "../controllers/applicationController"
 );
@@ -20,5 +26,12 @@ router.get(
 );
 
 router.put("/:id", updateApplicationStatus);
+
+router.get(
+  "/company-applicants",
+  protect,
+  authorize("company"),
+  getCompanyApplicants
+);
 
 module.exports = router;

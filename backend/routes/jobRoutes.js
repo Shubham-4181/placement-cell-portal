@@ -8,6 +8,8 @@ const {
 const {
   createJob,
   getJobs,
+  getMyJobs,
+  deleteJob,
 } = require("../controllers/jobController");
 
 router.post(
@@ -17,6 +19,15 @@ router.post(
   createJob
 );
 
+router.get(
+  "/my-jobs",
+  protect,
+  authorize("company"),
+  getMyJobs
+);
+
 router.get("/", getJobs);
+
+router.delete("/:id", deleteJob);
 
 module.exports = router;

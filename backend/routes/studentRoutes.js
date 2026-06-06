@@ -4,6 +4,7 @@ const {
   protect,
   authorize,
 } = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
 const {
   createStudent,
@@ -12,6 +13,7 @@ const {
   getStudentByUserId,
   updateStudent,
   deleteStudent,
+  uploadResume,
 } = require("../controllers/studentController");
 
 router.post("/", createStudent);
@@ -29,6 +31,13 @@ router.delete(
   protect,
   authorize("admin"),
   deleteStudent
+);
+
+router.post(
+  "/upload-resume",
+  protect,
+  upload.single("resume"),
+  uploadResume
 );
 
 module.exports = router;
