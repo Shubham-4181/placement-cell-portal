@@ -199,7 +199,7 @@ async function loadDashboard() {
 
   const studentsResponse =
     await fetch(
-      "http://localhost:8080/api/students",
+      "/api/students",
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -217,7 +217,7 @@ async function loadDashboard() {
 
   const jobsResponse =
     await fetch(
-      "http://localhost:8080/api/jobs"
+      "/api/jobs"
     );
 
   const jobsData =
@@ -230,7 +230,7 @@ async function loadDashboard() {
 
   const applicationsResponse =
     await fetch(
-      "http://localhost:8080/api/applications"
+      "/api/applications"
     );
 
   const applicationsData =
@@ -274,7 +274,7 @@ async function loadStudents() {
 
   const response =
     await fetch(
-      "http://localhost:8080/api/students",
+      "/api/students",
       {
         headers: {
           Authorization:
@@ -313,7 +313,7 @@ async function loadCompanies() {
 
   const response =
     await fetch(
-      "http://localhost:8080/api/auth/companies",
+      "/api/auth/companies",
       {
         headers: {
   Authorization: `Bearer ${token}`
@@ -348,7 +348,7 @@ async function loadApplications() {
 
   const response =
     await fetch(
-      "http://localhost:8080/api/applications"
+      "/api/applications"
     );
 
   const data =
@@ -414,7 +414,7 @@ async function(e){
 
   const response =
     await fetch(
-      "http://localhost:8080/api/auth/register",
+      "/api/auth/register",
       {
         method:"POST",
 

@@ -87,7 +87,7 @@ async function loadApplicants() {
 
     const response =
       await fetch(
-"http://localhost:8080/api/applications/company-applicants",
+"/api/applications/company-applicants",
 {
   headers:{
     Authorization:
@@ -125,7 +125,7 @@ async function loadApplicants() {
     app.studentId?.resumeUrl
       ?
       `<a
-        href="http://localhost:8080/uploads/${app.studentId.resumeUrl}"
+        href="/uploads/${app.studentId.resumeUrl}"
         target="_blank"
         class="btn btn-info btn-sm"
       >
@@ -197,7 +197,7 @@ async function updateStatus(
 
     const response =
       await fetch(
-        `http://localhost:8080/api/applications/${applicationId}`,
+        `/api/applications/${applicationId}`,
         {
           method: "PUT",
           headers: {

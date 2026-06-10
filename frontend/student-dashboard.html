@@ -86,7 +86,7 @@ async function loadStudentProfile() {
   try {
 
     const response = await fetch(
-      `http://localhost:8080/api/students/user/${userId}`
+      `/api/students/user/${userId}`
     );
 
     const data = await response.json();
@@ -148,7 +148,7 @@ async function uploadResume() {
 
   const response =
     await fetch(
-      "http://localhost:8080/api/students/upload-resume",
+      "/api/students/upload-resume",
       {
         method: "POST",
 

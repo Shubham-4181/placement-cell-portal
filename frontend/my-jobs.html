@@ -38,7 +38,7 @@ localStorage.getItem("token");
 
 const response =
 await fetch(
-"http://localhost:8080/api/jobs/my-jobs",
+"/api/jobs/my-jobs",
 {
 headers:{
 Authorization:
@@ -120,7 +120,7 @@ localStorage.getItem("token");
 
 const response =
 await fetch(
-`http://localhost:8080/api/jobs/${jobId}`,
+`/api/jobs/${jobId}`,
 {
 method:"DELETE",
 

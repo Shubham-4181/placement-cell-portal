@@ -89,7 +89,7 @@ const password =
 document.getElementById("password").value;
 
 await fetch(
-"http://localhost:8080/api/auth/register",
+"/api/auth/register",
 {
 method:"POST",
 headers:{
@@ -105,7 +105,7 @@ role:"student"
 );
 
 await fetch(
-"http://localhost:8080/api/students",
+"/api/students",
 {
 method:"POST",
 headers:{

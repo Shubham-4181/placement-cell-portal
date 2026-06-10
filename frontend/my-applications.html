@@ -36,7 +36,7 @@ async function loadApplications() {
       localStorage.getItem("userId");
 
     const response = await fetch(
-      `http://localhost:8080/api/applications/user/${userId}`
+      `/api/applications/user/${userId}`
     );
 
     const data = await response.json();

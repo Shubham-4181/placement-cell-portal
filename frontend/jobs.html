@@ -30,7 +30,7 @@
 async function loadJobs() {
 
   const response = await fetch(
-    "http://localhost:8080/api/jobs"
+    "/api/jobs"
   );
 
   const data = await response.json();
@@ -84,7 +84,7 @@ async function applyJob(jobId) {
 
   const studentResponse =
     await fetch(
-      `http://localhost:8080/api/students/user/${userId}`
+      `/api/students/user/${userId}`
     );
 
   const studentData =
@@ -108,7 +108,7 @@ async function applyJob(jobId) {
 
   const response =
     await fetch(
-      "http://localhost:8080/api/applications",
+      "/api/applications",
       {
         method: "POST",
 
