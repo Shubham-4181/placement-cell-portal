@@ -8,6 +8,7 @@
       rel="stylesheet"
     />
 </head>
+
 <body>
 
 <div class="container mt-4">
@@ -19,7 +20,86 @@
     ← Back to Dashboard
   </a>
 
-  <h2 class="mb-4">Available Jobs</h2>
+  <div class="mb-3">
+
+    <input
+      type="text"
+      id="searchBox"
+      class="form-control"
+      placeholder="Search Job / Skill"
+    />
+
+  </div>
+
+  <div class="row mb-3">
+
+<div class="col-md-6">
+
+<input
+type="number"
+id="packageFilter"
+class="form-control"
+placeholder="Minimum Package"
+/>
+
+</div>
+
+<div class="col-md-6">
+
+<input
+type="text"
+id="skillFilter"
+class="form-control"
+placeholder="Filter By Skill"
+/>
+
+</div>
+
+<div>
+<select
+id="sortOption"
+class="form-select"
+onchange="sortJobs()"
+>
+<option value="">
+Sort Jobs
+</option>
+
+<option value="high">
+Highest Package
+</option>
+
+<option value="low">
+Lowest Package
+</option>
+
+<option value="new">
+Newest Jobs
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+<button
+class="btn btn-primary mb-3"
+onclick="filterJobs()"
+>
+Apply Filters
+</button>
+
+<button
+class="btn btn-secondary mb-3 ms-2"
+onclick="loadJobs()"
+>
+Reset
+</button>
+
+  <h2 class="mb-4">
+    Available Jobs
+  </h2>
 
   <div id="jobsContainer"></div>
 
@@ -27,23 +107,39 @@
 
 <script>
 
-async function loadJobs() {
+document
+.getElementById("searchBox")
+.addEventListener(
+  "keyup",
+  searchJobs
+);
 
-  const response = await fetch(
-    "/api/jobs"
-  );
-
-  const data = await response.json();
+function displayJobs(jobs) {
 
   const jobsContainer =
-    document.getElementById("jobsContainer");
+  document.getElementById(
+    "jobsContainer"
+  );
 
   jobsContainer.innerHTML = "";
 
-  data.jobs.forEach(job => {
+  if(jobs.length === 0){
+
+    jobsContainer.innerHTML = `
+      <div class="alert alert-warning">
+        No Jobs Found
+      </div>
+    `;
+
+    return;
+  }
+
+  jobs.forEach(job => {
 
     jobsContainer.innerHTML += `
+
       <div class="card mb-3">
+
         <div class="card-body">
 
           <p>
@@ -51,7 +147,9 @@ async function loadJobs() {
             ${job.companyId?.name || "N/A"}
           </p>
 
-          <h4>${job.title}</h4>
+          <h4>
+            ${job.title}
+          </h4>
 
           <p>
             ${job.description}
@@ -62,6 +160,16 @@ async function loadJobs() {
             ₹${job.package || 0}
           </p>
 
+          <p>
+            <strong>Skills:</strong>
+            ${
+              job.skills &&
+              job.skills.length > 0
+              ? job.skills.join(", ")
+              : "N/A"
+            }
+          </p>
+
           <button
             class="btn btn-success"
             onclick="applyJob('${job._id}')"
@@ -70,80 +178,207 @@ async function loadJobs() {
           </button>
 
         </div>
+
       </div>
+
     `;
 
   });
 
 }
 
+async function searchJobs() {
+
+  try{
+
+    const keyword =
+    document.getElementById(
+      "searchBox"
+    ).value;
+
+    if(keyword.trim() === ""){
+
+      loadJobs();
+      return;
+
+    }
+
+    const response =
+    await fetch(
+      `/api/jobs/search?search=${keyword}`
+    );
+
+    const data =
+    await response.json();
+
+    displayJobs(
+      data.jobs || []
+    );
+
+  }catch(error){
+
+    console.log(error);
+
+  }
+
+}
+
+async function loadJobs() {
+
+  try{
+
+    const response =
+    await fetch(
+      "/api/jobs"
+    );
+
+    const data =
+    await response.json();
+
+    displayJobs(
+      data.jobs || []
+    );
+
+  }catch(error){
+
+    console.log(error);
+
+  }
+
+}
+
 async function applyJob(jobId) {
 
-  const userId =
-    localStorage.getItem("userId");
+  try{
 
-  const studentResponse =
+    const userId =
+    localStorage.getItem(
+      "userId"
+    );
+
+    const studentResponse =
     await fetch(
       `/api/students/user/${userId}`
     );
 
-  const studentData =
+    const studentData =
     await studentResponse.json();
 
-  if (
-    !studentData.student ||
-    !studentData.student.resumeUrl
-  ) {
+    if(
+      !studentData.student ||
+      !studentData.student.resumeUrl
+    ){
 
-    alert(
-      "Please upload your resume before applying."
-    );
+      alert(
+        "Please upload your resume before applying."
+      );
 
-    window.location.href =
+      window.location.href =
       "student-dashboard.html";
 
-    return;
+      return;
 
-  }
+    }
 
-  const response =
+    const response =
     await fetch(
       "/api/applications",
       {
-        method: "POST",
+        method:"POST",
 
-        headers: {
+        headers:{
           "Content-Type":
           "application/json"
         },
 
-        body: JSON.stringify({
+        body:JSON.stringify({
+
           studentId:
           localStorage.getItem(
             "studentId"
           ),
 
           jobId
+
         })
+
       }
     );
 
-  const data =
+    const data =
     await response.json();
 
-  if (data.success) {
+    if(data.success){
+
+      alert(
+        "Application Submitted Successfully"
+      );
+
+    }else{
+
+      alert(
+        data.message ||
+        "Failed To Apply"
+      );
+
+    }
+
+  }catch(error){
+
+    console.log(error);
 
     alert(
-      "Application Submitted"
-    );
-
-  } else {
-
-    alert(
-      data.message
+      "Something Went Wrong"
     );
 
   }
+
+}
+
+async function filterJobs(){
+
+const packageValue =
+document.getElementById(
+"packageFilter"
+).value;
+
+const skill =
+document.getElementById(
+"skillFilter"
+).value;
+
+const response =
+await fetch(
+`/api/jobs/filter?package=${packageValue}&skill=${skill}`
+);
+
+const data =
+await response.json();
+
+displayJobs(
+data.jobs
+);
+
+}
+
+async function sortJobs(){
+
+const sort =
+document.getElementById(
+"sortOption"
+).value;
+
+const response =
+await fetch(
+`/api/jobs/sort?sort=${sort}`
+);
+
+const data =
+await response.json();
+
+displayJobs(
+data.jobs
+);
 
 }
 

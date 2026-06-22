@@ -42,6 +42,14 @@ placeholder="Package"
 required
 >
 
+<input
+type="text"
+id="skills"
+class="form-control mb-3"
+placeholder="Skills (comma separated)"
+required
+>
+
 <button
 type="submit"
 class="btn btn-success"
@@ -63,8 +71,20 @@ async function(e){
 
 e.preventDefault();
 
+try{
+
 const token =
 localStorage.getItem("token");
+
+if(!token){
+
+alert("Please Login First");
+window.location.href =
+"login.html";
+
+return;
+
+}
 
 const title =
 document.getElementById("title").value;
@@ -74,6 +94,13 @@ document.getElementById("description").value;
 
 const packageValue =
 document.getElementById("package").value;
+
+const skills =
+document.getElementById("skills")
+.value
+.split(",")
+.map(skill => skill.trim())
+.filter(skill => skill !== "");
 
 const response =
 await fetch(
@@ -90,7 +117,8 @@ Authorization:
 body:JSON.stringify({
 title,
 description,
-package:packageValue
+package: packageValue,
+skills
 })
 }
 );
@@ -102,12 +130,29 @@ if(data.success){
 
 alert("Job Added Successfully");
 
+document
+.getElementById("jobForm")
+.reset();
+
 window.location.href =
 "company-dashboard.html";
 
 }else{
 
-alert("Failed");
+alert(
+data.message ||
+"Failed To Add Job"
+);
+
+}
+
+}catch(error){
+
+console.log(error);
+
+alert(
+"Something Went Wrong"
+);
 
 }
 
