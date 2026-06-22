@@ -1,127 +1,62 @@
-Placement Cell Portal
+# Placement Cell Portal
 
-A Full Stack Placement Cell Portal developed using HTML, CSS, Bootstrap, JavaScript, Node.js, Express.js, MongoDB Atlas, JWT Authentication, and Gemini AI Integration.
+A Full Stack Placement Cell Portal built using Node.js, Express.js, MongoDB, JWT Authentication, and Bootstrap.
 
-The system helps students find placement opportunities, companies manage recruitment, and administrators monitor placement activities through a centralized platform.
 
-Project Overview
+# Features
 
-The Placement Cell Portal is designed to automate and simplify campus placement activities. The platform provides role-based access for Students, Companies, and Administrators.
+## Student Module
 
-Students can register, upload resumes, apply for jobs, and track application status.
+* Register and Login
+* Upload Resume
+* View Available Jobs
+* Apply for Jobs
+* View Application Status
 
-Companies can post jobs, manage applications, and shortlist candidates.
+## Company Module
 
-Administrators can monitor the entire placement process, manage users, and analyze placement statistics.
+* Login
+* Add New Jobs
+* View Posted Jobs
+* View Applicants
+* View Candidate Resume
+* Shortlist Candidates
+* Reject Candidates
+* Select Candidates
 
-Key Features
-Student Module
-Student Registration and Login
-JWT Based Authentication
-Profile Management
-Resume Upload (PDF)
-View Available Jobs
-Apply for Jobs
-Track Application Status
-View Placement Updates
-AI-Based Job Recommendations
-Placement Assistant Chatbot
-Company Module
-Company Login
-Post New Job Opportunities
-Edit/Delete Job Listings
-View Posted Jobs
-View Applicants
-Download Candidate Resumes
-Shortlist Candidates
-Reject Candidates
-Select Candidates
-Manage Recruitment Process
-Admin Module
-Secure Admin Login
-Manage Students
-Manage Companies
-Manage Jobs
-Manage Applications
-Add New Companies
-Placement Statistics Dashboard
-Placement Percentage Calculation
-Monitor Overall Portal Activity
-AI Features
-Gemini AI Placement Assistant
+## Admin Module
 
-The portal integrates Gemini AI to provide:
+* View Students
+* View Companies
+* View Applications
+* Add New Company
+* Placement Statistics Dashboard
+* Placement Percentage
 
-Placement Guidance
-Interview Preparation Assistance
-Resume Improvement Suggestions
-Career Related Queries
-Job Search Assistance
-AI Job Recommendation System
+# Tech Stack
 
-The system recommends jobs based on:
+## Frontend
 
-Student Skills
-Required Job Skills
-Eligibility Criteria
-Profile Matching
+* HTML
+* CSS
+* Bootstrap
+* JavaScript
 
-Matching Score Formula:
+## Backend
 
-Match Percentage = (Matched Skills / Required Skills) × 100
+* Node.js
+* Express.js
 
-Placement Analytics Dashboard
+## Database
 
-Admin Dashboard provides:
+* MongoDB
 
-Total Students
-Total Companies
-Total Jobs
-Total Applications
-Selected Students
-Rejected Applications
-Shortlisted Candidates
-Placement Percentage
+## Authentication
 
-Future enhancements include:
+* JWT
 
-Bar Charts
-Pie Charts
-Monthly Placement Trends
-Skill Analytics Dashboard
-Technology Stack
-Frontend
-HTML5
-CSS3
-Bootstrap 5
-JavaScript
-Backend
-Node.js
-Express.js
-Database
-MongoDB Atlas
-Mongoose ODM
-Authentication & Security
-JWT Authentication
-Password Hashing using BcryptJS
-Role-Based Access Control
-Protected API Routes
-Secure Environment Variables
-Project Architecture
-Frontend (HTML/CSS/Bootstrap/JS)
-            │
-            ▼
-REST APIs (Express.js)
-            │
-            ▼
-Authentication Layer (JWT)
-            │
-            ▼
-MongoDB Atlas Database
-            │
-            ▼
-AI Services (Gemini API)
-Project Structure
+# Project Structure
+
 PlacementCellPortal
 │
 ├── backend
@@ -130,71 +65,49 @@ PlacementCellPortal
 │   ├── models
 │   ├── routes
 │   ├── uploads
-│   ├── config
-│   ├── services
 │   ├── server.js
 │   ├── package.json
 │   └── .env
 │
 ├── frontend
-│   ├── pages
-│   ├── css
-│   ├── js
-│   ├── images
-│   └── assets
+│   ├── login.html
+│   ├── register.html
+│   ├── student-dashboard.html
+│   ├── company-dashboard.html
+│   ├── admin-dashboard.html
+│   ├── jobs.html
+│   ├── my-applications.html
+│   ├── my-jobs.html
+│   └── add-job.html
 │
 └── README.md
-Database Collections
-users
 
-Stores:
+# Step 1: Clone Repository
 
-Admin
-Student
-Company
-students
 
-Stores:
-
-Name
-Email
-Skills
-Resume
-Course Information
-companies
-
-Stores:
-
-Company Details
-Contact Information
-Posted Jobs
-jobs
-
-Stores:
-
-Job Title
-Description
-Skills Required
-Package
-Location
-Deadline
-applications
-
-Stores:
-
-Student Information
-Job Information
-Application Status
-Installation Guide
-Step 1: Clone Repository
 git clone <repository-url>
+
+
 cd PlacementCellPortal
-Step 2: Install Backend Dependencies
+
+
+# Step 2: Install Backend Dependencies
+
+Go to backend folder:
+
+```bash
 cd backend
+```
+
+Install packages:
+
+```bash
 npm install
+```
 
-Dependencies:
+This will install:
 
+```text
 express
 mongoose
 bcryptjs
@@ -203,135 +116,357 @@ cors
 dotenv
 multer
 nodemon
-Step 3: Configure Environment Variables
+```
 
-Create:
+---
 
+# Step 3: Create .env File
+
+Create a file named:
+
+```text
 backend/.env
+```
 
 Add:
 
+```env
 PORT=8080
 
-MONGO_URI=your_mongodb_atlas_connection_string
+MONGO_URI=mongodb://127.0.0.1:27017/placement_portal
 
-JWT_SECRET=your_secret_key
+JWT_SECRET=mysecretkey
+```
 
-GEMINI_API_KEY=your_api_key
-Step 4: Start Backend Server
+---
+
+# Step 4: Start MongoDB
+
+Open Command Prompt:
+
+```bash
+mongod
+```
+
+OR start MongoDB service from Windows Services.
+
+Verify MongoDB is running:
+
+```bash
+mongosh
+```
+
+Then:
+
+```js
+show dbs
+```
+
+---
+
+# Step 5: Start Backend Server
+
+Inside backend folder:
+
+```bash
 npm run dev
+```
 
-Expected Output:
+Expected output:
 
+```text
 Server Running On Port 8080
-MongoDB Connected Successfully
+MongoDB Connected
+```
 
 Backend URL:
 
+```text
 http://localhost:8080
-Step 5: Run Frontend
+```
 
-Open frontend using Live Server.
+---
 
-frontend/login.html
+# Step 6: Run Frontend
+
+Open project in VS Code.
+
+Go to:
+
+```text
+frontend
+```
+
+Right click:
+
+```text
+login.html
+```
+
+Click:
+
+```text
+Open With Live Server
+```
 
 Frontend URL:
 
+```text
 http://127.0.0.1:5500/frontend/login.html
-Deployment
-Frontend Deployment
+```
 
-Platform:
+---
 
-Vercel
+# Step 7: Create Admin User
 
-Features:
+Open Mongo Shell:
 
-Fast Hosting
-Automatic Deployment
-HTTPS Support
-Backend Deployment
+```bash
+mongosh
+```
 
-Platform:
+Select database:
 
-Render
+```js
+use placement_portal
+```
 
-Features:
+Insert Admin:
 
-API Hosting
-Environment Variable Support
-Continuous Deployment
-Database Hosting
+```js
+db.users.insertOne({
 
-Platform:
+  name:"Admin",
 
-MongoDB Atlas
+  email:"admin@gmail.com",
 
-Features:
+  password:"$2b$10$123456789012345678901uJ9nDqg0P6tJmA6Z6w8Q3P6M9K9W",
 
-Cloud Database
-Secure Access
-Automatic Backups
-Application Flow
-Student Registration
-         ↓
+  role:"admin"
+
+})
+```
+
+Or create admin manually through MongoDB Compass.
+
+---
+
+# Login Credentials
+
+## Admin
+
+```text
+Email:
+admin@gmail.com
+
+Password:
+admin1234
+```
+
+## Company
+
+Created from Admin Dashboard.
+
+Example:
+
+```text
+Email:
+tcs@gmail.com
+
+Password:
+tcs1234
+```
+
+## Student
+
+Register using Register Page.
+
+---
+
+# Resume Upload
+
+Students must upload resume before applying.
+
+Supported:
+
+```text
+PDF
+```
+
+Uploaded resumes are stored in:
+
+```text
+backend/uploads
+```
+
+---
+
+# Application Flow
+
+```text
+Student Register
+        ↓
 Student Login
-         ↓
-Resume Upload
-         ↓
-Browse Jobs
-         ↓
-Apply for Job
-         ↓
+        ↓
+Upload Resume
+        ↓
+View Jobs
+        ↓
+Apply Job
+        ↓
 Company Reviews Application
-         ↓
+        ↓
 Shortlisted
-         ↓
+        ↓
 Selected / Rejected
-         ↓
-Placement Statistics Updated
-Testing Performed
-Authentication Testing
-Authorization Testing
-CRUD Operation Testing
-API Testing
-Resume Upload Testing
-Database Connectivity Testing
-Frontend-Backend Integration Testing
-Deployment Testing
-Challenges Faced
-MongoDB Atlas Configuration
-Connection String Issues
-IP Whitelisting Problems
-Deployment Issues
-Render Deployment Errors
-Environment Variable Configuration
-Security
-JWT Token Verification
-Protected Routes Implementation
-API Integration
-Gemini AI Integration
-Error Handling
-Learning Outcomes
+```
 
-Through this project, the following skills were developed:
+---
 
-Full Stack Development
-REST API Development
-JWT Authentication
+# Placement Statistics
+
+Admin Dashboard shows:
+
+* Total Students
+* Total Companies
+* Total Jobs
+* Total Applications
+* Placed Students
+* Placement Percentage
+
+---
+
+## Additional Student Features
+
+* AI Placement Assistant Chatbot
+* AI Based Career Guidance
+* AI Based Interview Preparation
+* AI Based Programming Help
+* Skill Based Job Recommendations
+* Match Percentage Calculation
+* Search Jobs
+* Filter Jobs By Skills
+* Filter Jobs By Package
+* Sort Jobs
+* Resume Upload Validation
+
+---
+
+## Additional Company Features
+
+* View All Applications
+* Manage Candidate Status
+* Update Candidate Status
+* Resume Download/View
+* Job Management Dashboard
+
+---
+
+## Additional Admin Features
+
+* Dashboard Analytics
+* Total Students Count
+* Total Companies Count
+* Total Jobs Count
+* Total Applications Count
+* Placed Students Count
+* Application Analytics Charts
+* Student Management
+* Company Management
+* Resume Management
+
+---
+
+# AI Integration
+
+The Placement Cell Portal includes an AI Placement Assistant powered by Google Gemini API.
+
+Features:
+
+* Interview Question Generation
+* Resume Guidance
+* Placement Preparation
+* Career Guidance
+* Programming Support
+* Aptitude Preparation
+* Communication Skill Improvement
+* Marathi and English Query Support
+
+---
+
+# Job Recommendation System
+
+The system provides AI Based Job Recommendations using student skills and job requirements.
+
+Recommendation Features:
+
+* Skill Matching
+* Match Percentage Calculation
+* Best Match Identification
+* Personalized Job Suggestions
+
+Example:
+
+Student Skills:
+Node.js, MongoDB, React
+
+Job Skills:
+Node.js, MongoDB, Express, React
+
+Match Score:
+75%
+
+---
+
+# Cloud Deployment
+
+## Frontend Deployment
+
+Platform:
+
+```text
+Vercel
+```
+
+---
+
+## Backend Deployment
+
+Platform:
+
+```text
+Render
+```
+
+---
+
+## Database Hosting
+
+Platform:
+
+```text
 MongoDB Atlas
-Cloud Deployment
-Git & GitHub Workflow
-AI Integration
-Database Design
-Role-Based Access Control
-Problem Solving & Debugging
-Future Enhancements
-Real-Time Notifications
-Email Alerts
-Advanced Analytics Dashboard
-AI Resume Analyzer
-Interview Scheduling System
-Skill Gap Analysis
-Mobile Application
-Chat System Between Student and Company
+```
+
+---
+
+# Security Features
+
+* JWT Authentication
+* Password Hashing using BcryptJS
+* Protected Routes
+* Role Based Access Control
+* Secure API Access
+
+---
+
+# Future Enhancements
+
+* Email Notifications
+* Interview Scheduling
+* Real Time Notifications
+* Advanced AI Resume Analyzer
+* Placement Reports PDF Export
+* Company Analytics Dashboard
+
+---
