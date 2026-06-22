@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   protect,
   authorize,
@@ -10,6 +11,9 @@ const {
   getJobs,
   getMyJobs,
   deleteJob,
+  searchJobs,
+  filterJobs,
+  sortJobs
 } = require("../controllers/jobController");
 
 router.post(
@@ -26,8 +30,29 @@ router.get(
   getMyJobs
 );
 
-router.get("/", getJobs);
+router.get(
+  "/search",
+  searchJobs
+);
 
-router.delete("/:id", deleteJob);
+router.get(
+  "/filter",
+  filterJobs
+);
+
+router.get(
+"/sort",
+sortJobs
+);
+
+router.get(
+  "/",
+  getJobs
+);
+
+router.delete(
+  "/:id",
+  deleteJob
+);
 
 module.exports = router;

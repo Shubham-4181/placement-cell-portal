@@ -3,12 +3,21 @@ const mongoose = require("mongoose");
 const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
+const dashboardRoutes =
+require("./routes/dashboardRoutes");
+const recommendationRoutes =
+require(
+"./routes/recommendationRoutes"
+);
+const aiRoutes =
+require("./routes/aiRoutes");
 
 const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
+
 
 const app = express();
 
@@ -26,11 +35,26 @@ app.use(
   )
 );
 
+app.use(
+"/api/recommendations",
+recommendationRoutes
+);
+
+app.use(
+  "/api/dashboard",
+  dashboardRoutes
+);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
+
+app.use(
+"/api/ai",
+aiRoutes
+);
 
 app.use(
   express.static(
@@ -55,10 +79,6 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-
-app.get("/", (req, res) => {
-  res.send("Placement Cell Portal API Running");
-});
 
 
 
