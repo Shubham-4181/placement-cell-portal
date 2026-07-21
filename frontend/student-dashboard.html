@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+<style>
+
+body{
+    background:#f4f7fc;
+}
+
+.navbar{
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.stat-card{
+    border:none;
+    border-radius:15px;
+    color:white;
+    padding:20px;
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.bg-blue{
+    background:#0d6efd;
+}
+
+.bg-green{
+    background:#198754;
+}
+
+.bg-orange{
+    background:#fd7e14;
+}
+
+.bg-purple{
+    background:#6f42c1;
+}
+
+.recommendation-card{
+    border:none;
+    border-radius:15px;
+    overflow:hidden;
+    transition:0.3s;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+.recommendation-card:hover{
+    transform:translateY(-5px);
+}
+
+.match-badge{
+    display:inline-block;
+    padding:8px 15px;
+    border-radius:30px;
+    color:white;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.skill-tag{
+    display:inline-block;
+    background:#eef2ff;
+    color:#333;
+    padding:6px 12px;
+    border-radius:20px;
+    margin:3px;
+    font-size:13px;
+}
+
+.progress{
+    height:22px;
+    border-radius:20px;
+}
+
+.section-title{
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.resume-card{
+    border:none;
+    border-radius:15px;
+}
+
+/* Chat Layout Fixes */
+.chat-bubble-user {
+    background:#0d6efd;
+    color:white;
+    padding:10px 14px;
+    border-radius:15px 15px 0px 15px;
+    display:inline-block;
+    max-width:85%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+}
+
+.chat-bubble-ai {
+    background:#e9ecef;
+    color: #212529;
+    padding:10px 14px;
+    border-radius:15px 15px 15px 0px;
+    display:inline-block;
+    max-width:85%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+    line-height: 1.5;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container">
+
+    <span class="navbar-brand">
+      🎓 Student Dashboard
+    </span>
+
+    <div class="d-flex gap-2">
+      <a
+        href="my-applications.html"
+        class="btn btn-success"
+      >
+        My Applications
+      </a>
+
+      <button
+        class="btn btn-danger"
+        onclick="logout()"
+      >
+        Logout
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<div class="container mt-4">
+
+<div class="row mb-4">
+
+<div class="col-md-3">
+<div class="stat-card bg-blue">
+<h3 id="totalJobs">0</h3>
+<p class="mb-0">Recommended Jobs</p>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="stat-card bg-green">
+<h3 id="bestMatch">0%</h3>
+<p class="mb-0">Best Match</p>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="stat-card bg-orange">
+<h3 id="resumeStatus">No</h3>
+<p class="mb-0">Resume Uploaded</p>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="stat-card bg-purple">
+<h3 id="studentSkills">0</h3>
+<p class="mb-0">Total Skills</p>
+</div>
+</div>
+
+</div>
+
+<div class="card resume-card shadow-sm">
+
+<div class="card-body">
+
+<h2>
+Welcome
+</h2>
+
+<div id="tokenStatus" class="my-3"></div>
+
+<a
+href="jobs.html"
+class="btn btn-primary"
+>
+View Jobs
+</a>
+
+<hr>
+
+<h4 class="mt-4">
+📄 Upload Resume
+</h4>
+
+<div class="mb-3">
+<input
+type="file"
+id="resumeFile"
+class="form-control"
+/>
+</div>
+
+<button
+class="btn btn-primary"
+onclick="uploadResume()"
+>
+Upload Resume
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container mt-5">
+
+<h2 class="section-title">
+🤖 AI Recommended Jobs
+</h2>
+
+<div
+id="recommendedJobs"
+class="row"
+></div>
+
+</div>
+
+<button id="chatToggle"
+style="
+position:fixed;
+bottom:20px;
+right:20px;
+width:65px;
+height:65px;
+border:none;
+border-radius:50%;
+background:#0d6efd;
+color:white;
+font-size:28px;
+cursor:pointer;
+z-index:9999;
+box-shadow:0 4px 15px rgba(0,0,0,0.3);
+">
+🤖
+</button>
+
+<div id="chatBox"
+style="
+display:none;
+position:fixed;
+bottom:90px;
+right:20px;
+width:380px;
+height:500px;
+background:white;
+border-radius:15px;
+box-shadow:0 5px 20px rgba(0,0,0,0.3);
+z-index:9999;
+overflow:hidden;
+flex-direction:column;
+">
+
+<div
+style="
+background:#0d6efd;
+color:white;
+padding:15px;
+font-size:18px;
+font-weight:bold;
+"
+>
+AI Placement Assistant
+</div>
+
+<div
+id="chatMessages"
+style="
+flex:1;
+overflow-y:auto;
+padding:15px;
+background:#f8f9fa;
+">
+</div>
+
+<div class="p-3" style="background: white; border-top:1px solid #ddd;">
+
+<input
+type="text"
+id="userMessage"
+class="form-control mb-2"
+placeholder="Ask anything..."
+>
+
+<div>
+<button
+class="btn btn-success w-100"
+onclick="sendMessage()"
+>
+Send
+</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const token =
+localStorage.getItem("token");
+
+const userId =
+localStorage.getItem("userId");
+
+if(!token){
+window.location.href="login.html";
+}
+
+async function loadStudentProfile(){
+
+try{
+
+const response =
+await fetch(
+`/api/students/user/${userId}`,
+{
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`
+  }
+}
+);
+
+const data =
+await response.json();
+
+if(data.success && data.student){
+
+localStorage.setItem(
+"studentId",
+data.student._id
+);
+
+document.getElementById(
+"tokenStatus"
+).innerHTML=`
+
+<h3>${data.student.fullName}</h3>
+
+<p>
+<b>Email:</b>
+${data.student.email}
+</p>
+
+<p>
+<b>Branch:</b>
+${data.student.branch || "N/A"}
+</p>
+
+<p>
+<b>CGPA:</b>
+${data.student.cgpa || "N/A"}
+</p>
+
+`;
+
+document.getElementById(
+"studentSkills"
+).innerText =
+data.student.skills
+? data.student.skills.length
+: 0;
+
+document.getElementById(
+"resumeStatus"
+).innerText =
+data.student.resumeUrl
+? "Yes"
+: "No";
+
+}else{
+
+document.getElementById(
+"tokenStatus"
+).innerHTML =
+"<p class='text-danger'>Student Profile Not Found</p>";
+
+}
+
+}catch(error){
+console.log(error);
+}
+
+}
+
+loadStudentProfile();
+
+function logout(){
+
+localStorage.removeItem("token");
+localStorage.removeItem("userId");
+localStorage.removeItem("studentId");
+
+window.location.href =
+"login.html";
+
+}
+
+async function uploadResume(){
+
+const file =
+document.getElementById(
+"resumeFile"
+).files[0];
+
+if(!file){
+
+alert(
+"Please select a resume"
+);
+
+return;
+
+}
+
+const formData =
+new FormData();
+
+formData.append(
+"resume",
+file
+);
+
+const response =
+await fetch(
+"/api/students/upload-resume",
+{
+method:"POST",
+
+headers:{
+Authorization:
+`Bearer ${localStorage.getItem("token")}`
+},
+
+body:formData
+}
+);
+
+const data =
+await response.json();
+
+alert(data.message);
+
+}
+
+async function loadRecommendations(){
+
+try{
+
+const studentId =
+localStorage.getItem(
+"studentId"
+);
+
+const response =
+await fetch(
+`/api/recommendations/${studentId}`,
+{
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`
+  }
+}
+);
+
+const data =
+await response.json();
+
+const container =
+document.getElementById(
+"recommendedJobs"
+);
+
+container.innerHTML="";
+
+document.getElementById(
+"totalJobs"
+).innerText =
+data.recommendations.length;
+
+let bestMatch = 0;
+
+data.recommendations
+.slice(0,6)
+.forEach(item=>{
+
+if(item.score > bestMatch){
+bestMatch = item.score;
+}
+
+let badgeColor =
+"#dc3545";
+
+if(item.score >= 80){
+badgeColor = "#198754";
+}
+else if(item.score >= 50){
+badgeColor = "#0d6efd";
+}
+else if(item.score >= 25){
+badgeColor = "#fd7e14";
+}
+
+const skillsHTML =
+item.job.skills
+.map(skill=>`
+<span class="skill-tag">
+${skill}
+</span>
+`)
+.join("");
+
+container.innerHTML += `
+
+<div class="col-md-6 mb-4">
+
+<div class="card recommendation-card">
+
+<div class="card-body">
+
+<h4>
+${item.job.title}
+</h4>
+
+<p>
+${item.job.description}
+</p>
+
+<div
+class="match-badge"
+style="background:${badgeColor}"
+>
+${item.score}% Match
+</div>
+
+<div class="progress mb-3">
+
+<div
+class="progress-bar bg-success"
+style="width:${item.score}%"
+>
+${item.score}%
+</div>
+
+</div>
+
+<h6>
+Required Skills
+</h6>
+
+${skillsHTML}
+
+<hr>
+
+<p>
+
+<b>Matched Skills:</b>
+
+${item.matched.length
+? item.matched.join(", ")
+: "No Match"}
+
+</p>
+
+<p>
+
+<b>Package:</b>
+
+₹${item.job.package?.toLocaleString() || "N/A"}
+
+</p>
+
+<button
+class="btn btn-primary"
+>
+Apply Now
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById(
+"bestMatch"
+).innerText =
+bestMatch + "%";
+
+}catch(error){
+
+console.log(error);
+
+}
+
+}
+
+setTimeout(()=>{
+loadRecommendations();
+},1000);
+
+const chatToggle =
+document.getElementById("chatToggle");
+
+const chatBox =
+document.getElementById("chatBox");
+
+chatToggle.addEventListener(
+"click",
+() => {
+
+if(
+chatBox.style.display === "none" ||
+chatBox.style.display === ""
+){
+chatBox.style.display = "flex";
+}
+else{
+chatBox.style.display = "none";
+}
+
+}
+);
+
+async function sendMessage(){
+
+const input =
+document.getElementById(
+"userMessage"
+);
+
+const message =
+input.value.trim();
+
+if(!message) return;
+
+const chatMessages =
+document.getElementById(
+"chatMessages"
+);
+
+chatMessages.innerHTML += `
+<div style="text-align:right; margin-bottom:15px;">
+<span class="chat-bubble-user">
+${message}
+</span>
+</div>
+`;
+
+input.value = "";
+
+chatMessages.scrollTop =
+chatMessages.scrollHeight;
+
+try{
+
+const response =
+await fetch(
+"/api/ai/chat",
+{
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json",
+Authorization:
+`Bearer ${localStorage.getItem("token")}`
+},
+
+body:JSON.stringify({
+message
+})
+}
+);
+
+const data =
+await response.json();
+
+// Clean up markdown hashes if backend sends raw headers
+let formattedReply = data.reply;
+if (formattedReply) {
+    formattedReply = formattedReply.replace(/###\s*/g, '');
+}
+
+chatMessages.innerHTML += `
+<div style="margin-bottom:15px; text-align:left;">
+<span class="chat-bubble-ai">${formattedReply}</span>
+</div>
+`;
+
+chatMessages.scrollTop =
+chatMessages.scrollHeight;
+
+}catch(error){
+
+chatMessages.innerHTML += `
+<div style="margin-bottom:15px; text-align:left;">
+<span class="chat-bubble-ai" style="background:#dc3545; color:white;">
+AI Error
+</span>
+</div>
+`;
+
+}
+
+}
+
+document
+.getElementById("userMessage")
+.addEventListener(
+"keypress",
+function(e){
+
+if(e.key === "Enter"){
+sendMessage();
+}
+
+}
+);
+
+</script>
+
+</body>
+</html>

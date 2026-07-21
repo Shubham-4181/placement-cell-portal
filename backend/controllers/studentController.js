@@ -30,6 +30,8 @@ const getStudents = async (req, res) => {
   }
 };
 
+
+
 const getStudentById = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
@@ -79,10 +81,66 @@ const deleteStudent = async (req, res) => {
   }
 };
 
+const getStudentByUserId = async (req, res) => {
+  try {
+
+    const student = await Student.findOne({
+      userId: req.params.userId
+    });
+
+    res.status(200).json({
+      success: true,
+      student
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+const uploadResume = async (req, res) => {
+  try {
+
+    const student =
+      await Student.findOne({
+        userId: req.user.id
+      });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found"
+      });
+    }
+
+    student.resumeUrl =
+      req.file.filename;
+
+    await student.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Resume Uploaded Successfully",
+      resumeUrl: student.resumeUrl
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+};
+
 module.exports = {
   createStudent,
   getStudents,
   getStudentById,
+  getStudentByUserId,
   updateStudent,
   deleteStudent,
+  uploadResume,
 };
