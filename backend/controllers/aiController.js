@@ -1,23 +1,23 @@
-const { GoogleGenerativeAI } =
-require("@google/generative-ai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const genAI =
-new GoogleGenerativeAI(
-process.env.GEMINI_API_KEY
-);
+// Gemini API चेकिंग व इनिशियलायझेशन
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const askAI = async (req, res) => {
+  try {
+    const { message, history } = req.body;
 
-try {
+    if (!message || message.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Message is required."
+      });
+    }
 
-const { message } = req.body;
-
-const model =
-genAI.getGenerativeModel({
-model: "gemini-2.5-flash"
-});
-
-const prompt = `
+    // gemini-1.5-flash किंवा gemini-2.0-flash मॉडेल वापरा (gemini-2.5 अस्तित्वात नाही)
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: `
 You are PlacementGPT, an intelligent AI career mentor integrated inside a Placement Cell Portal.
 
 Your personality:
@@ -28,36 +28,28 @@ Your personality:
 - Motivating
 - Human-like
 
-You can communicate fluently in:
-- English
-- Marathi
-- Hindi
-
 Language Rules:
-- Always reply in the same language used by the user.
+- Always reply in the exact same language used by the user.
 - If user speaks Marathi, reply in Marathi.
 - If user speaks Hindi, reply in Hindi.
 - If user speaks English, reply in English.
-- If user mixes languages, reply naturally in the same mixed language.
+- If user mixes languages (e.g. Marathi + English / Hinglish), reply naturally in the same mixed language.
 
 Conversation Rules:
 - Remember the current conversation context.
 - Continue the discussion naturally.
-- Do not restart the conversation every time.
 - Answer follow-up questions correctly.
-- If user says "next", continue previous topic.
-- If user asks casual questions, answer like a friendly human assistant.
+- If user says "next", continue from the previous topic seamlessly.
+- Never restart the conversation every time.
+- Never say: "As an AI language model...". Behave like a real placement mentor.
 
 Formatting Rules:
-- Keep answers clean and readable.
-- Use headings when needed.
-- Use bullet points.
-- Avoid huge paragraphs.
-- Avoid giving extremely long answers unless specifically requested.
-- For interview questions provide 5-10 questions at a time.
-- For coding questions explain step-by-step.
-- For aptitude questions explain shortcuts.
-- For resume reviews give strengths, weaknesses and improvements.
+- Use clean Markdown formatting.
+- Use bold text, headings, and bullet points.
+- Never return one huge paragraph.
+- Put every point/question on a new line.
+- For interview questions, provide minimum 5-10 questions.
+- For coding questions, provide step-by-step solutions.
 
 Placement Expertise:
 You are an expert in:
@@ -150,39 +142,36 @@ Rules:
 12. If user asks coding questions, provide examples.
 13. If user asks roadmap, provide step-by-step roadmap.
 14. If user asks resume help, provide actionable suggestions.
+      `
+    });
 
+    // फ्रंटएंडवरून येणारी Chat History (जर नसेल तर रिकामी ॲरे सेट होईल)
+    const formattedHistory = Array.isArray(history) ? history : [];
 
-Current User Message:
-${message}
-`;
+    // History सह Chat Session सुरू करणे
+    const chat = model.startChat({
+      history: formattedHistory
+    });
 
-const result =
-await model.generateContent(
-prompt
-);
+    // AI ला मेसेज पाठवणे
+    const result = await chat.sendMessage(message);
+    const responseText = result.response.text();
 
-const response =
-result.response.text();
+    return res.status(200).json({
+      success: true,
+      reply: responseText
+    });
 
-res.status(200).json({
-success:true,
-reply:response
-});
+  } catch (error) {
+    console.error("Gemini AI Controller Error:", error);
 
-}
-catch(error){
-
-console.log(error);
-
-res.status(500).json({
-success:false,
-message:error.message
-});
-
-}
-
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to process AI chat request."
+    });
+  }
 };
 
 module.exports = {
-askAI
+  askAI
 };

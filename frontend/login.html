@@ -3,186 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <title>Login</title>
 
+  <!-- Bootstrap 5 CSS -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
+  <!-- Bootstrap Icons -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" 
+    rel="stylesheet"
+  />
 </head>
 
-<body class="bg-light">
+<body class="bg-light min-vh-100 d-flex align-items-center justify-content-center py-4">
 
-  <div class="container mt-5">
-
+  <div class="container">
     <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-5">
 
-      <div class="col-md-5">
+        <div class="card shadow-sm border-0 rounded-3">
+          <div class="card-body p-4 p-sm-5">
 
-        <div class="card shadow">
+            <h3 class="card-title text-center fw-bold mb-4">Welcome Back</h3>
 
-          <div class="card-body">
+            <!-- Dynamic Alert for Success / Error messages -->
+            <div id="alertContainer"></div>
 
-            <h3 class="text-center mb-4">
-              Login
-            </h3>
+            <form id="loginForm" novalidate>
 
-            <form id="loginForm">
-
+              <!-- Email Field -->
               <div class="mb-3">
-                <label>Email</label>
-
+                <label for="email" class="form-label">Email address</label>
                 <input
                   type="email"
                   id="email"
                   class="form-control"
+                  placeholder="name@example.com"
+                  autocomplete="username"
                   required
                 />
               </div>
 
+              <!-- Password Field -->
               <div class="mb-3">
-                <label>Password</label>
-
-                <input
-                  type="password"
-                  id="password"
-                  class="form-control"
-                  required
-                />
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                  <input
+                    type="password"
+                    id="password"
+                    class="form-control"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                  />
+                  <button 
+                    class="btn btn-outline-secondary" 
+                    type="button" 
+                    id="togglePassword"
+                    aria-label="Toggle password visibility"
+                  >
+                    <i class="bi bi-eye" id="toggleIcon"></i>
+                  </button>
+                </div>
               </div>
 
+              <!-- Submit Button -->
               <button
                 type="submit"
-                class="btn btn-primary w-100"
+                id="submitBtn"
+                class="btn btn-primary w-100 py-2 mt-2 fw-semibold"
               >
-                Login
+                <span id="btnText">Login</span>
+                <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
               </button>
 
-              <div class="text-center mt-3">
-
-<a href="register.html">
-
-Create New Account
-
-</a>
-
-</div>
+              <!-- Registration Link -->
+              <div class="text-center mt-4">
+                <span class="text-muted small">Don't have an account?</span>
+                <a href="register.html" class="text-decoration-none fw-semibold ms-1">Create New Account</a>
+              </div>
 
             </form>
 
           </div>
-
         </div>
 
       </div>
-
     </div>
-
   </div>
 
-<script>
-document
-  .getElementById("loginForm")
-  .addEventListener("submit", async (e) => {
+  <script>
+    // Elements
+    const loginForm = document.getElementById("loginForm");
+    const passwordInput = document.getElementById("password");
+    const togglePasswordBtn = document.getElementById("togglePassword");
+    const toggleIcon = document.getElementById("toggleIcon");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const alertContainer = document.getElementById("alertContainer");
 
-    e.preventDefault();
+    // Role-to-Dashboard Redirect Mapping
+    const dashboardMap = {
+      student: "student-dashboard.html",
+      admin: "admin-dashboard.html",
+      company: "company-dashboard.html"
+    };
 
-    const email =
-      document.getElementById("email").value;
+    // Toggle Password Visibility
+    togglePasswordBtn.addEventListener("click", () => {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      toggleIcon.classList.toggle("bi-eye", !isPassword);
+      toggleIcon.classList.toggle("bi-eye-slash", isPassword);
+    });
 
-    const password =
-      document.getElementById("password").value;
+    // Helper: Display Bootstrap Alert Banner
+    function showAlert(message, type = "danger") {
+      alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+    }
 
-    try {
+    // Helper: Set Button Loading State
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      if (isLoading) {
+        btnText.textContent = "Logging in...";
+        btnSpinner.classList.remove("d-none");
+      } else {
+        btnText.textContent = "Login";
+        btnSpinner.classList.add("d-none");
+      }
+    }
 
-      const response = await fetch(
-        "/api/auth/login",
-        {
+    // Form Submit Handler
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      alertContainer.innerHTML = ""; // Clear existing alerts
+
+      const email = document.getElementById("email").value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showAlert("Please fill in all fields.");
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const response = await fetch("/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            email,
-            password
-          })
-        }
-      );
+          body: JSON.stringify({ email, password })
+        });
 
-      const data =
-        await response.json();
+        const data = await response.json();
 
-      console.log(data);
+        if (response.ok && data.success) {
+          showAlert("Login successful! Redirecting...", "success");
 
-      if (data.success) {
+          // Store auth state
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("userId", data.userId);
+          localStorage.setItem("role", data.role);
+          localStorage.setItem("userName", data.name);
 
-        localStorage.setItem(
-          "token",
-          data.token
-        );
+          // Redirect based on role or fall back to default
+          const redirectUrl = dashboardMap[data.role] || "dashboard.html";
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 800);
 
-        localStorage.setItem(
-          "userId",
-          data.userId
-        );
-
-        localStorage.setItem(
-          "role",
-          data.role
-        );
-
-        localStorage.setItem(
-          "userName",
-          data.name
-        );
-
-        if (
-          data.role === "student"
-        ) {
-
-          window.location.href =
-            "student-dashboard.html";
-
-        }
-        else if (
-          data.role === "admin"
-        ) {
-
-          window.location.href =
-            "admin-dashboard.html";
-
-        }
-        else if (
-          data.role === "company"
-        ) {
-
-          window.location.href =
-            "company-dashboard.html";
-
+        } else {
+          showAlert(data.message || "Invalid credentials. Please try again.");
         }
 
-      } else {
-
-        alert(
-          data.message ||
-          "Login Failed"
-        );
-
+      } catch (error) {
+        console.error("Login error:", error);
+        showAlert("Unable to connect to the server. Please check your network and try again.");
+      } finally {
+        setLoading(false);
       }
+    });
+  </script>
 
-    } catch (error) {
-
-      console.log(error);
-
-      alert(
-        "Something went wrong"
-      );
-
-    }
-
-  });
-</script>
-
+  <!-- Optional Bootstrap JS for dismissal of alert component -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

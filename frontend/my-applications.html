@@ -1,141 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Applications</title>
 
-<title>My Applications</title>
-
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet"
-/>
-
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 </head>
 
-<body>
+<body class="bg-light">
 
-<div class="container mt-4">
+<div class="container my-4">
 
-<h2>My Applications</h2>
+  <a href="student-dashboard.html" class="btn btn-outline-secondary mb-3">
+    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+  </a>
 
-<a
-  href="student-dashboard.html"
-  class="btn btn-secondary mb-3"
->
-  ← Back to Dashboard
-</a>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h3 mb-0">My Applications</h2>
+    <button class="btn btn-sm btn-outline-primary" onclick="loadApplications()">
+      <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+    </button>
+  </div>
 
-<div id="applicationsContainer"></div>
+  <!-- Applications Container -->
+  <div id="applicationsContainer"></div>
 
 </div>
 
 <script>
+// Status badge mapping helper
+const STATUS_BADGES = {
+  Applied: '<span class="badge bg-secondary-subtle text-secondary border border-secondary"><i class="bi bi-clock me-1"></i> Applied</span>',
+  Shortlisted: '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning"><i class="bi bi-star-fill me-1"></i> Shortlisted</span>',
+  Selected: '<span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-check-circle-fill me-1"></i> Selected</span>',
+  Hired: '<span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-check-circle-fill me-1"></i> Hired</span>',
+  Rejected: '<span class="badge bg-danger-subtle text-danger border border-danger"><i class="bi bi-x-circle-fill me-1"></i> Rejected</span>'
+};
+
+function showLoading() {
+  const container = document.getElementById("applicationsContainer");
+  container.innerHTML = `
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading applications...</span>
+      </div>
+    </div>
+  `;
+}
 
 async function loadApplications() {
+  const container = document.getElementById("applicationsContainer");
+  const userId = localStorage.getItem("userId");
 
-    const userId =
-      localStorage.getItem("userId");
+  if (!userId) {
+    container.innerHTML = `
+      <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        User session not found. Please log in again.
+      </div>
+    `;
+    return;
+  }
 
-    const response = await fetch(
-      `/api/applications/user/${userId}`
-    );
+  try {
+    showLoading();
 
+    const response = await fetch(`/api/applications/user/${userId}`);
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    
     const data = await response.json();
 
-    const container =
-      document.getElementById(
-        "applicationsContainer"
-      );
-
-    container.innerHTML = "";
-
-    if (
-      !data.applications ||
-      data.applications.length === 0
-    ) {
-
+    if (!data.applications || data.applications.length === 0) {
       container.innerHTML = `
-        <div class="alert alert-info">
-          No Applications Found
+        <div class="card text-center py-5 border-0 shadow-sm">
+          <div class="card-body">
+            <i class="bi bi-briefcase fs-1 text-muted d-block mb-3"></i>
+            <h5 class="text-muted">No Applications Found</h5>
+            <p class="text-secondary small mb-3">You haven't applied to any job positions yet.</p>
+            <a href="jobs.html" class="btn btn-primary btn-sm">Browse Available Jobs</a>
+          </div>
         </div>
       `;
-
       return;
     }
 
-    data.applications.forEach(app => {
+    const applicationCards = data.applications.map(app => {
+      const jobTitle = app.jobId?.title || "Position Unavailable";
+      const companyName = app.jobId?.companyId?.name || "N/A";
+      const salaryPackage = app.jobId?.package ? `₹${Number(app.jobId.package).toLocaleString('en-IN')}` : null;
+      const appliedDate = app.createdAt ? new Date(app.createdAt).toLocaleDateString('en-IN', {
+        year: 'numeric', month: 'short', day: 'numeric'
+      }) : null;
 
-let badge = "";
+      const badge = STATUS_BADGES[app.status] || `<span class="badge bg-light text-dark border">${app.status || 'Pending'}</span>`;
 
-if(app.status === "Applied"){
+      return `
+        <div class="card shadow-sm mb-3 border-0">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h5 class="card-title text-primary mb-1">${jobTitle}</h5>
+                <p class="card-subtitle text-muted fw-semibold">
+                  <i class="bi bi-building me-1"></i>${companyName}
+                </p>
+              </div>
+              <div>${badge}</div>
+            </div>
 
-  badge =
-  `<span class="badge bg-secondary">
-    Applied
-  </span>`;
+            <div class="d-flex flex-wrap gap-3 text-secondary small mt-3 pt-2 border-top">
+              ${salaryPackage ? `<span><i class="bi bi-cash-stack me-1 text-success"></i><strong>Package:</strong> ${salaryPackage}</span>` : ''}
+              ${appliedDate ? `<span><i class="bi bi-calendar3 me-1"></i><strong>Applied On:</strong> ${appliedDate}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
 
-}
-else if(app.status === "Shortlisted"){
+    container.innerHTML = applicationCards;
 
-  badge =
-  `<span class="badge bg-warning">
-    Shortlisted
-  </span>`;
-
-}
-else if(app.status === "Rejected"){
-
-  badge =
-  `<span class="badge bg-danger">
-    Rejected
-  </span>`;
-
-}
-else if(app.status === "Selected"){
-
-  badge =
-  `<span class="badge bg-success">
-    Selected
-  </span>`;
-
-}
-
-container.innerHTML += `
-
-<div class="card mb-3">
-
-  <div class="card-body">
-
-    <h5>
-      ${app.jobId?.title || "N/A"}
-    </h5>
-
-    <p>
-
-      <strong>Company:</strong>
-
-      ${app.jobId?.companyId?.name || "N/A"}
-
-    </p>
-
-    <p>
-
-      <strong>Status:</strong>
-
-      ${badge}
-
-    </p>
-
-  </div>
-
-</div>
-
-`;
-
-});
+  } catch (error) {
+    console.error("Error loading applications:", error);
+    container.innerHTML = `
+      <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-octagon me-2"></i>
+        Failed to load applications. Please try again later.
+      </div>
+    `;
+  }
 }
 
+// Initial fetch on page load
 loadApplications();
-
 </script>
 
 </body>

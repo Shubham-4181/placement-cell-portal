@@ -1,164 +1,203 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Job</title>
 
-<title>Add Job</title>
-
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet"
-/>
-
+  <!-- Bootstrap 5 CSS & Icons CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
 </head>
 
-<body>
+<body class="bg-light">
 
-<div class="container mt-5">
+<div class="container my-5" style="max-width: 650px;">
 
-<h2>Add New Job</h2>
+  <!-- Header & Back Button -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h3 fw-bold mb-1">Create Job Listing</h2>
+      <p class="text-muted mb-0">Fill in details to post a new opening for candidates.</p>
+    </div>
+    <a href="company-dashboard.html" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Dashboard
+    </a>
+  </div>
 
-<form id="jobForm">
+  <!-- Form Card Container -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-4">
 
-<input
-type="text"
-id="title"
-class="form-control mb-3"
-placeholder="Job Title"
-required
->
+      <!-- Alert Container for Dynamic Messages -->
+      <div id="alertContainer"></div>
 
-<textarea
-id="description"
-class="form-control mb-3"
-placeholder="Job Description"
-required
-></textarea>
+      <form id="jobForm" class="needs-validation" novalidate>
 
-<input
-type="number"
-id="package"
-class="form-control mb-3"
-placeholder="Package"
-required
->
+        <!-- Job Title -->
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            id="title"
+            class="form-control"
+            placeholder="e.g. Full Stack Web Developer"
+            required
+          />
+          <label for="title">Job Title</label>
+        </div>
 
-<input
-type="text"
-id="skills"
-class="form-control mb-3"
-placeholder="Skills (comma separated)"
-required
->
+        <!-- Job Description -->
+        <div class="form-floating mb-3">
+          <textarea
+            id="description"
+            class="form-control"
+            placeholder="Describe duties, responsibilities, and qualifications"
+            style="height: 120px;"
+            required
+          ></textarea>
+          <label for="description">Job Description</label>
+        </div>
 
-<button
-type="submit"
-class="btn btn-success"
->
-Add Job
-</button>
+        <!-- Package -->
+        <div class="form-floating mb-3">
+          <input
+            type="number"
+            id="package"
+            class="form-control"
+            placeholder="e.g. 800000"
+            min="0"
+            step="any"
+            required
+          />
+          <label for="package">Package / CTC (in ₹ per annum)</label>
+          <div class="form-text ms-1">Enter raw numbers (e.g., 600000 for 6 LPA).</div>
+        </div>
 
-</form>
+        <!-- Skills Required -->
+        <div class="form-floating mb-4">
+          <input
+            type="text"
+            id="skills"
+            class="form-control"
+            placeholder="e.g. JavaScript, React, Node.js"
+            required
+          />
+          <label for="skills">Skills Required</label>
+          <div class="form-text ms-1">Separate skills with commas (e.g., React, Node.js, MongoDB).</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="company-dashboard.html" class="btn btn-light border px-4">
+            Cancel
+          </a>
+          <button type="submit" id="submitBtn" class="btn btn-primary px-4">
+            <i class="bi bi-plus-circle me-1"></i> Post Job
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
 
 </div>
 
 <script>
-
-document
-.getElementById("jobForm")
-.addEventListener(
-"submit",
-async function(e){
-
-e.preventDefault();
-
-try{
-
-const token =
-localStorage.getItem("token");
-
-if(!token){
-
-alert("Please Login First");
-window.location.href =
-"login.html";
-
-return;
-
+// Helper to show dynamic UI alerts
+function showAlert(message, type = "danger") {
+  const alertContainer = document.getElementById("alertContainer");
+  alertContainer.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show shadow-sm" role="alert">
+      <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  `;
 }
 
-const title =
-document.getElementById("title").value;
+document.getElementById("jobForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-const description =
-document.getElementById("description").value;
+  const submitBtn = document.getElementById("submitBtn");
+  const alertContainer = document.getElementById("alertContainer");
+  alertContainer.innerHTML = ""; // Clear previous alerts
 
-const packageValue =
-document.getElementById("package").value;
+  const token = localStorage.getItem("token");
+  if (!token) {
+    showAlert("Authentication missing. Redirecting to login...", "warning");
+    setTimeout(() => { window.location.href = "login.html"; }, 1500);
+    return;
+  }
 
-const skills =
-document.getElementById("skills")
-.value
-.split(",")
-.map(skill => skill.trim())
-.filter(skill => skill !== "");
+  // Retrieve input values
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const packageValue = document.getElementById("package").value.trim();
+  const skillsInput = document.getElementById("skills").value;
 
-const response =
-await fetch(
-"/api/jobs",
-{
-method:"POST",
+  // Process skills string to array
+  const skills = skillsInput
+    .split(",")
+    .map(skill => skill.trim())
+    .filter(skill => skill !== "");
 
-headers:{
-"Content-Type":"application/json",
-Authorization:
-`Bearer ${token}`
-},
+  if (!title || !description || !packageValue || skills.length === 0) {
+    showAlert("Please fill out all fields properly.", "danger");
+    return;
+  }
 
-body:JSON.stringify({
-title,
-description,
-package: packageValue,
-skills
-})
-}
-);
+  // UI state: Loading
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span> Posting...`;
 
-const data =
-await response.json();
+  try {
+    const response = await fetch("/api/jobs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        package: packageValue,
+        skills
+      })
+    });
 
-if(data.success){
+    const data = await response.json();
 
-alert("Job Added Successfully");
+    if (response.ok && (data.success !== false)) {
+      showAlert("Job added successfully! Redirecting to dashboard...", "success");
+      document.getElementById("jobForm").reset();
 
-document
-.getElementById("jobForm")
-.reset();
+      setTimeout(() => {
+        window.location.href = "company-dashboard.html";
+      }, 1200);
+    } else {
+      showAlert(data.message || "Failed to add job. Please try again.", "danger");
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<i class="bi bi-plus-circle me-1"></i> Post Job`;
+    }
 
-window.location.href =
-"company-dashboard.html";
-
-}else{
-
-alert(
-data.message ||
-"Failed To Add Job"
-);
-
-}
-
-}catch(error){
-
-console.log(error);
-
-alert(
-"Something Went Wrong"
-);
-
-}
-
+  } catch (error) {
+    console.error("Add job error:", error);
+    showAlert("Network error occurred. Please check your connection.", "danger");
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<i class="bi bi-plus-circle me-1"></i> Post Job`;
+  }
 });
-
 </script>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

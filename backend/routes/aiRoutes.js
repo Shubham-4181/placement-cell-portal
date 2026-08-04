@@ -1,18 +1,9 @@
-const express =
-require("express");
+const express = require("express");
+const router = express.Router();
 
-const router =
-express.Router();
+const { askAI } = require("../controllers/aiController");
 
-const {
-askAI
-} =
-require("../controllers/aiController");
+// POST Endpoint for AI Assistant
+router.post("/chat", askAI);
 
-router.post(
-"/chat",
-askAI
-);
-
-module.exports =
-router;
+module.exports = router;
